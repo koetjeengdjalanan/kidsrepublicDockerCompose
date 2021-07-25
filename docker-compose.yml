@@ -1,0 +1,65 @@
+version: "3"
+services:
+  webserver:
+    hostname: formKR
+    container_name: webserver
+    image: php:8-apache
+    restart: always
+    build:
+      context: ./webserver
+    volumes:
+      - /home/dockerized/user/:/var/www/html/
+    ports:
+      - 21280:80
+      - 21243:443
+    networks:
+      - dev_networks
+    depends_on:
+      - phpmyadmin
+
+  adminserver:
+    hostname: adminKR
+    container_name: adminserver
+    image: php:8-apache
+    restart: always
+    build:
+      context: ./adminserver
+    volumes:
+      - /home/dockerized/admin/:/var/www/html/
+    ports:
+      - 21288:80
+      - 21244:443
+    networks:
+      - dev_networks
+    depends_on:
+      - phpmyadmin
+
+  db:
+    hostname: db_mysql
+    container_name: mysql
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 21236:3306
+    networks:
+      - dev_networks
+    environment:
+      - MYSQL_ROOT_PASSWORD=systemadminKR
+      - MYSQL_ALLOW_EMPTY_PASSWORD='yes'
+
+  phpmyadmin:
+    hostname: phpmyadmin
+    container_name: phpmyadmin
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 21281:80
+    networks:
+      - dev_networks
+    depends_on:
+      - db
+
+networks:
+  dev_networks:
+    name: dev_networks
